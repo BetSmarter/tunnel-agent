@@ -131,7 +131,7 @@ TunnelingAgent.prototype.createSocket = function createSocket(options, cb) {
         Buffer.from(connectOptions.proxyAuth).toString('base64')
   }
 
-  debug('making CONNECT request')
+  debug('making CONNECT request', options.host)
   var connectReq = self.request(connectOptions)
   connectReq.useChunkedEncodingByDefault = false // for v0.6
   connectReq.once('response', onResponse) // for v0.6
@@ -162,8 +162,8 @@ TunnelingAgent.prototype.createSocket = function createSocket(options, cb) {
       self.sockets[self.sockets.indexOf(placeholder)] = socket
       cb(socket)
     } else {
-      debug('tunneling socket could not be established, statusCode=%d', res.statusCode)
-      var error = new Error('tunneling socket could not be established, ' + 'statusCode=' + res.statusCode)
+      debug('tunneling socket could not be established, statusCode=%d', res.statusCode, options.host)
+      var error = new Error('tunneling socket could not be established, ' + 'statusCode=' + res.statusCode, options.host)
       error.code = 'ECONNRESET'
       options.request.emit('error', error)
       self.removeSocket(placeholder)
@@ -173,8 +173,8 @@ TunnelingAgent.prototype.createSocket = function createSocket(options, cb) {
   function onError(cause) {
     connectReq.removeAllListeners()
 
-    debug('tunneling socket could not be established, cause=%s\n', cause.message, cause.stack)
-    var error = new Error('tunneling socket could not be established, ' + 'cause=' + cause.message)
+    debug('tunneling socket could not be established, cause=%s\n', options.host, cause.message, cause.stack)
+    var error = new Error('tunneling socket could not be established, ' + 'cause=' + cause.message, options.host)
     error.code = 'ECONNRESET'
     options.request.emit('error', error)
     self.removeSocket(placeholder)
